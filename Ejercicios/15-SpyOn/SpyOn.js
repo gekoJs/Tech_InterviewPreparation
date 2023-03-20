@@ -156,3 +156,43 @@ module.exports = spyOn
 // console.log(ejemplo.run());
 
 // module.exports = spyOn;
+
+
+
+
+
+
+
+
+const spyOn = (fn) => {
+  let counter = 0;
+  let calledArgs = new Set();
+  let results = new Set();
+
+  function spy(...args) {
+    counter++;
+    for (const arg of args) calledArgs.add(arg);
+    const result = fn(...args);
+    results.add(result);
+    return result;
+  }
+  spy.getCallCount = () => counter;
+  spy.wasCalledWith = (value) => calledArgs.has(value);
+  spy.returned = (value) => results.has(value);
+
+  return spy;
+};
+
+module.exports = spyOn;
+
+const adder = (n1, n2) => n1 + n2;
+const adderSpy = spyOn(adder); //spy
+
+console.log(adderSpy.getCallCount());// 0
+adderSpy(2, 3); //5
+adderSpy(4, 10); //5
+adderSpy(8, 99); //107
+console.log(adderSpy.getCallCount()); // 3
+console.log(adderSpy.wasCalledWith(99)); // true
+console.log(adderSpy.returned(0)); // false
+console.log(adderSpy.returned(107)); // true
